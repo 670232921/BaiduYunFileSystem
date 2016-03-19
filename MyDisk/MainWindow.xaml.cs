@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Windows;
 
@@ -10,6 +14,8 @@ namespace MyDisk
     /// </summary>
     public partial class MainWindow : Window
     {
+        static string encryptKey = "Side";    //定义密钥  
+        const string REGRoot = "SOFTWARE\\MyApp\\Baidudisk";
         Dictionary<string, BaiduDisk> logedins = new Dictionary<string, BaiduDisk>();
         System.Windows.Forms.NotifyIcon icon = new System.Windows.Forms.NotifyIcon();
         bool exit = false;
@@ -21,6 +27,7 @@ namespace MyDisk
             icon.Text = "百度云本地磁盘";
             icon.Click += Icon_Click;
             icon.Visible = true;
+            LoadFromReg();
         }
 
         private void Icon_Click(object sender, EventArgs e)
@@ -28,29 +35,42 @@ namespace MyDisk
             this.WindowState = WindowState.Normal;
         }
 
-        private void StratThread()
+        private void LoadFromReg()
+        {
+            RegistryKey key = Registry.CurrentUser.CreateSubKey(REGRoot);
+            var names = key.GetValueNames();
+            foreach (string name in names)
+            {
+                var pas = Decrypt(key.GetValue(name).ToString());
+                StratThread(name, pas);
+            }
+        }
+
+        private void StratThread(string user, string pass)
         {
             string[] ss = new string[2];
-            ss[0] = user.Text;
-            ss[1] = pass.Password;
+            ss[0] = user;
+            ss[1] = pass;
             var ht = new Thread(Start1);
             ht.IsBackground = true;
             ht.Start(ss);
         }
 
-        private void LoginSuccess(string user, bool succ, BaiduDisk disk)
+        private void LoginSuccess(string user, string pass, bool succ, BaiduDisk disk)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
                 if (succ)
                 {
-                    Notification.Content = "登录成功";
+                    Notification.Text += user + " 登录成功\r\n";
                     logedins.Add(user, disk);
                     listBox.Items.Add(user);
+                    RegistryKey key = Registry.CurrentUser.CreateSubKey(REGRoot);
+                    key.SetValue(user, Encrypt(pass));
                 }
                 else
                 {
-                    Notification.Content = "登录失败";
+                    Notification.Text += user + " 登录失败\r\n";
                 }
             }));
         }
@@ -64,7 +84,7 @@ namespace MyDisk
             Pfm.MountCreateParams mcp = new Pfm.MountCreateParams();
             Pfm.MarshallerServeParams msp = new Pfm.MarshallerServeParams();
             BaiduDisk volume = new BaiduDisk(par[0], par[1]);
-            LoginSuccess(par[0], volume.IsAviliable(), volume);
+            LoginSuccess(par[0], par[1], volume.IsAviliable(), volume);
             if (!volume.IsAviliable())
             {
                 return;
@@ -165,7 +185,10 @@ namespace MyDisk
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            StratThread();
+            if (!listBox.Items.Contains(user.Text))
+            {
+                StratThread(user.Text, pass.Password);
+            }
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
@@ -175,6 +198,8 @@ namespace MyDisk
                 var disk = logedins[listBox.SelectedItem.ToString()];
                 if (disk != null)
                 {
+                    RegistryKey key = Registry.CurrentUser.CreateSubKey(REGRoot);
+                    key.DeleteValue(listBox.SelectedItem.ToString());
                     disk.marshaller.ServeCancel();
                     listBox.Items.Remove(listBox.SelectedItem);
                 }
@@ -193,5 +218,112 @@ namespace MyDisk
             icon.Visible = !exit;
             e.Cancel = !exit;
         }
+
+
+
+
+        #region 加密字符串  
+
+        /// <summary> /// 加密字符串   
+
+        /// </summary>  
+
+        /// <param name="str">要加密的字符串</param>  
+
+        /// <returns>加密后的字符串</returns>  
+
+        static string Encrypt(string str)
+
+        {
+
+            DESCryptoServiceProvider descsp = new DESCryptoServiceProvider();   //实例化加/解密类对象   
+
+
+
+            byte[] key = Encoding.Unicode.GetBytes(encryptKey); //定义字节数组，用来存储密钥    
+
+
+
+            byte[] data = Encoding.Unicode.GetBytes(str);//定义字节数组，用来存储要加密的字符串  
+
+
+
+            MemoryStream MStream = new MemoryStream(); //实例化内存流对象      
+
+
+
+            //使用内存流实例化加密流对象   
+
+            CryptoStream CStream = new CryptoStream(MStream, descsp.CreateEncryptor(key, key), CryptoStreamMode.Write);
+
+
+
+            CStream.Write(data, 0, data.Length);  //向加密流中写入数据      
+
+
+
+            CStream.FlushFinalBlock();              //释放加密流      
+
+
+
+            return Convert.ToBase64String(MStream.ToArray());//返回加密后的字符串  
+
+        }
+
+        #endregion
+
+
+
+        #region 解密字符串   
+
+        /// <summary>  
+
+        /// 解密字符串   
+
+        /// </summary>  
+
+        /// <param name="str">要解密的字符串</param>  
+
+        /// <returns>解密后的字符串</returns>  
+
+        static string Decrypt(string str)
+
+        {
+
+            DESCryptoServiceProvider descsp = new DESCryptoServiceProvider();   //实例化加/解密类对象    
+
+
+
+            byte[] key = Encoding.Unicode.GetBytes(encryptKey); //定义字节数组，用来存储密钥    
+
+
+
+            byte[] data = Convert.FromBase64String(str);//定义字节数组，用来存储要解密的字符串  
+
+
+
+            MemoryStream MStream = new MemoryStream(); //实例化内存流对象      
+
+
+
+            //使用内存流实例化解密流对象       
+
+            CryptoStream CStream = new CryptoStream(MStream, descsp.CreateDecryptor(key, key), CryptoStreamMode.Write);
+
+
+
+            CStream.Write(data, 0, data.Length);      //向解密流中写入数据     
+
+
+
+            CStream.FlushFinalBlock();               //释放解密流      
+
+
+
+            return Encoding.Unicode.GetString(MStream.ToArray());       //返回解密后的字符串  
+
+        }
+
+        #endregion
     }
 }

@@ -15,8 +15,8 @@
         <TextBox x:Name="user" HorizontalAlignment="Left" Height="23" Margin="24.671,50.48,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="233.701"/>
         <Label x:Name="label2" Content="密码：" HorizontalAlignment="Left" Margin="24.671,98.565,0,0" VerticalAlignment="Top"/>
         <PasswordBox x:Name="pass" HorizontalAlignment="Left" Margin="24.671,123.805,0,0" VerticalAlignment="Top" Width="233.701" Height="27.127"/>
-        <Button x:Name="button1" Content="登录" HorizontalAlignment="Left" Margin="98.824,189.525,0,0" VerticalAlignment="Top" Width="75" Click="button1_Click" IsDefault="True"/>
-        <Label x:Name="Notification" Content="" HorizontalAlignment="Left" Margin="24.671,237.971,0,0" VerticalAlignment="Top" Height="36.724" Width="233.701"/>
+        <Button x:Name="button1" Content="登录" HorizontalAlignment="Left" Margin="99.813,171.751,0,0" VerticalAlignment="Top" Width="75" Click="button1_Click" IsDefault="True"/>
+        <TextBox x:Name="Notification" Text="" HorizontalAlignment="Left" Margin="24.671,195.991,0,0" VerticalAlignment="Top" Height="78.704" Width="233.701" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True" MaxHeight="78" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
         <Button x:Name="button2" Content="退出" HorizontalAlignment="Left" Margin="24.671,279.695,0,0" VerticalAlignment="Top" Width="233.701" Height="31.305" Click="button2_Click"/>
 
     </Grid>
