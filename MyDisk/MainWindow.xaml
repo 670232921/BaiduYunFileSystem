@@ -5,17 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MyDisk"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="525" ResizeMode="NoResize" ShowInTaskbar="False" WindowState="Minimized"
+        Closing="Window_Closing">
     <Grid>
         <ListBox x:Name="listBox" HorizontalAlignment="Left" Height="249.455" Margin="275.802,25.24,0,0" VerticalAlignment="Top" Width="231.198"/>
         <Label x:Name="label" Content="已登录的账户" HorizontalAlignment="Left" Margin="275.802,0,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="button" Content="登出" HorizontalAlignment="Left" Margin="275.802,279.695,0,0" VerticalAlignment="Top" Width="231.198" Height="39.305" Click="button_Click"/>
+        <Button x:Name="button" Content="登出" HorizontalAlignment="Left" Margin="275.802,279.695,0,0" VerticalAlignment="Top" Width="231.198" Height="31.305" Click="button_Click"/>
         <Label x:Name="label1" Content="用户名：" HorizontalAlignment="Left" Margin="24.671,25.24,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="user" HorizontalAlignment="Left" Height="23" Margin="24.671,50.48,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="233.701"/>
         <Label x:Name="label2" Content="密码：" HorizontalAlignment="Left" Margin="24.671,98.565,0,0" VerticalAlignment="Top"/>
         <PasswordBox x:Name="pass" HorizontalAlignment="Left" Margin="24.671,123.805,0,0" VerticalAlignment="Top" Width="233.701" Height="27.127"/>
         <Button x:Name="button1" Content="登录" HorizontalAlignment="Left" Margin="98.824,189.525,0,0" VerticalAlignment="Top" Width="75" Click="button1_Click" IsDefault="True"/>
-        <Label x:Name="Notification" Content="" HorizontalAlignment="Left" Margin="24.671,237.971,0,0" VerticalAlignment="Top" Height="71.029" Width="233.701"/>
+        <Label x:Name="Notification" Content="" HorizontalAlignment="Left" Margin="24.671,237.971,0,0" VerticalAlignment="Top" Height="36.724" Width="233.701"/>
+        <Button x:Name="button2" Content="退出" HorizontalAlignment="Left" Margin="24.671,279.695,0,0" VerticalAlignment="Top" Width="233.701" Height="31.305" Click="button2_Click"/>
 
     </Grid>
 </Window>

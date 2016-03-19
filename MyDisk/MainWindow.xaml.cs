@@ -11,10 +11,21 @@ namespace MyDisk
     public partial class MainWindow : Window
     {
         Dictionary<string, BaiduDisk> logedins = new Dictionary<string, BaiduDisk>();
+        System.Windows.Forms.NotifyIcon icon = new System.Windows.Forms.NotifyIcon();
+        bool exit = false;
 
         public MainWindow()
         {
             InitializeComponent();
+            icon.Icon = MyDisk.Properties.Resources.baidu;
+            icon.Text = "百度云本地磁盘";
+            icon.Click += Icon_Click;
+            icon.Visible = true;
+        }
+
+        private void Icon_Click(object sender, EventArgs e)
+        {
+            this.WindowState = WindowState.Normal;
         }
 
         private void StratThread()
@@ -168,6 +179,19 @@ namespace MyDisk
                     listBox.Items.Remove(listBox.SelectedItem);
                 }
             }
+        }
+
+        private void button2_Click(object sender, RoutedEventArgs e)
+        {
+            exit = true;
+            this.Close();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+            icon.Visible = !exit;
+            e.Cancel = !exit;
         }
     }
 }
