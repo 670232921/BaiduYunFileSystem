@@ -272,7 +272,23 @@ namespace MyDisk
 
         public void Read(Pfm.MarshallerReadOp op)
         {
-            op.Complete(Pfm.errorSuccess, 0);
+            long openId = op.OpenId();
+            if (!opens.ContainsKey(openId) || opens[openId].isdir != 0)
+            {
+                op.Complete(Pfm.errorAccessDenied, 0);
+            }
+            else
+            {
+                Debug.WriteLine("ReadFile:id:" + openId.ToString() +
+                    ";filename:" + opens[openId].server_filename +
+                    ";filesize:" + opens[openId].size.ToString() +
+                    ";offset:" + op.FileOffset().ToString() +
+                    ";size" + op.RequestedSize().ToString());
+                var stream = baidu1.GetStream(opens[openId]);
+                stream.Seek(op.FileOffset(), System.IO.SeekOrigin.Begin);
+                var retSize = stream.Read(op.Data(), 0, op.RequestedSize());
+                op.Complete(Pfm.errorSuccess, retSize);
+            }
         }
 
         public void ReadXattr(Pfm.MarshallerReadXattrOp op)
