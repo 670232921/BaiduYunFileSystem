@@ -98,6 +98,17 @@ namespace MyDisk
             }
         }
 
+        private void SetAttTime(ref Pfm.Attribs att, Entry entry)
+        {
+            long ts = entry.server_ctime;
+            att.createTime = Utility.GetTime(ts.ToString()).ToFileTime();
+            ts = entry.server_mtime;
+            ts = Utility.GetTime(ts.ToString()).ToFileTime();
+            att.accessTime = ts;
+            att.changeTime = ts;
+            att.writeTime = ts;
+        }
+
         #region interface impletement
         public void Access(Pfm.MarshallerAccessOp op)
         {
@@ -108,10 +119,7 @@ namespace MyDisk
             {
                 var entry = opens[openId];
                 att.accessLevel = Pfm.accessLevelReadData;
-                //att.attribs.accessTime = entry.local_mtime;
-                //att.attribs.createTime = entry.local_ctime;
-                //att.attribs.changeTime = entry.local_mtime;
-                //att.attribs.writeTime = entry.local_mtime;
+                SetAttTime(ref att.attribs, entry);
                 att.attribs.fileType = entry.isdir != 0 ? Pfm.fileTypeFolder : Pfm.fileTypeFile;
                 att.attribs.fileId = GetFileId(entry);
                 att.attribs.fileSize = entry.size;
@@ -171,10 +179,7 @@ namespace MyDisk
                 foreach (var item in entrys)
                 {
                     Pfm.Attribs att = new Pfm.Attribs();
-                    att.accessTime = entry.local_mtime;
-                    att.createTime = entry.local_ctime;
-                    att.changeTime = entry.local_mtime;
-                    att.writeTime = entry.local_mtime;
+                    SetAttTime(ref att, item);
                     att.fileId = GetFileId(item);
                     att.fileSize = item.size;
                     att.fileType = item.isdir != 0 ? Pfm.fileTypeFolder : Pfm.fileTypeFile;
@@ -252,10 +257,8 @@ namespace MyDisk
                     openAttribs.attribs.fileType = entry.isdir != 0 ? Pfm.fileTypeFolder : Pfm.fileTypeFile;
                     openAttribs.attribs.fileId = GetFileId(entry);
                     openAttribs.attribs.fileSize = entry.size;
-                    openAttribs.attribs.accessTime = entry.local_mtime;
-                    openAttribs.attribs.createTime = entry.local_ctime;
-                    openAttribs.attribs.changeTime = entry.local_mtime;
-                    openAttribs.attribs.writeTime = entry.local_mtime;
+                    SetAttTime(ref openAttribs.attribs, entry);
+
                     endName = entry.server_filename;
                 }
             }
