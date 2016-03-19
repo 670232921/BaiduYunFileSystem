@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
 
@@ -9,20 +10,38 @@ namespace MyDisk
     /// </summary>
     public partial class MainWindow : Window
     {
+        Dictionary<string, BaiduDisk> logedins = new Dictionary<string, BaiduDisk>();
+
         public MainWindow()
         {
             InitializeComponent();
-            StratThread();
         }
 
         private void StratThread()
         {
             string[] ss = new string[2];
-            ss[0] = "lvtingforccc@gmail.com";
-            ss[1] = "ccc1459260";
+            ss[0] = user.Text;
+            ss[1] = pass.Password;
             var ht = new Thread(Start1);
             ht.IsBackground = true;
             ht.Start(ss);
+        }
+
+        private void LoginSuccess(string user, bool succ, BaiduDisk disk)
+        {
+            this.Dispatcher.Invoke(new Action(() =>
+            {
+                if (succ)
+                {
+                    Notification.Content = "登录成功";
+                    logedins.Add(user, disk);
+                    listBox.Items.Add(user);
+                }
+                else
+                {
+                    Notification.Content = "登录失败";
+                }
+            }));
         }
 
         private void Start1(object data)
@@ -34,6 +53,12 @@ namespace MyDisk
             Pfm.MountCreateParams mcp = new Pfm.MountCreateParams();
             Pfm.MarshallerServeParams msp = new Pfm.MarshallerServeParams();
             BaiduDisk volume = new BaiduDisk(par[0], par[1]);
+            LoginSuccess(par[0], volume.IsAviliable(), volume);
+            if (!volume.IsAviliable())
+            {
+                return;
+            }
+
             IntPtr invalidFd = new IntPtr(-1);
 
             msp.dispatch = volume;
@@ -124,6 +149,24 @@ namespace MyDisk
             if (volume.marshaller != null)
             {
                 volume.marshaller.Dispose();
+            }
+        }
+
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            StratThread();
+        }
+
+        private void button_Click(object sender, RoutedEventArgs e)
+        {
+            if (listBox.SelectedItem != null)
+            {
+                var disk = logedins[listBox.SelectedItem.ToString()];
+                if (disk != null)
+                {
+                    disk.marshaller.ServeCancel();
+                    listBox.Items.Remove(listBox.SelectedItem);
+                }
             }
         }
     }
