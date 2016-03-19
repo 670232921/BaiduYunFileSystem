@@ -136,7 +136,18 @@ namespace MyDisk
         public void Capacity(Pfm.MarshallerCapacityOp op)
         {
             long openId = op.OpenId();
-            op.Complete(Pfm.errorSuccess, GetEntryFormId(openId).size, 0);
+            if (openId == 0 || opens.Count > 0 && opens.Keys.First() == openId)
+            {
+                op.Complete(Pfm.errorSuccess, baidu1.DriveInfo.total, baidu1.DriveInfo.total - baidu1.DriveInfo.used);
+            }
+            else if (opens.ContainsKey(openId))
+            {
+                op.Complete(Pfm.errorSuccess, opens[openId].size, 0);
+            }
+            else
+            {
+                op.Complete(Pfm.errorNotFound, 0, 0);
+            }
         }
 
         public void Close(Pfm.MarshallerCloseOp op)

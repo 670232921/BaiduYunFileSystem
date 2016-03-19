@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MyDisk"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" ResizeMode="NoResize" ShowInTaskbar="False" WindowState="Minimized"
-        Closing="Window_Closing">
+        Title="MainWindow" Height="350" Width="525" ResizeMode="NoResize" ShowInTaskbar="False"
+        Closing="Window_Closing" Visibility="Hidden">
     <Grid>
         <ListBox x:Name="listBox" HorizontalAlignment="Left" Height="249.455" Margin="275.802,25.24,0,0" VerticalAlignment="Top" Width="231.198"/>
         <Label x:Name="label" Content="已登录的账户" HorizontalAlignment="Left" Margin="275.802,0,0,0" VerticalAlignment="Top"/>

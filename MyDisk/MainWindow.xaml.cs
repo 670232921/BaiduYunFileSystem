@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Windows;
+using System.Linq;
 
 namespace MyDisk
 {
@@ -32,7 +33,9 @@ namespace MyDisk
 
         private void Icon_Click(object sender, EventArgs e)
         {
-            this.WindowState = WindowState.Normal;
+            //this.WindowState = WindowState.Normal;
+            this.ShowInTaskbar = true;
+            this.Visibility = Visibility.Visible;
         }
 
         private void LoadFromReg()
@@ -67,6 +70,7 @@ namespace MyDisk
                     listBox.Items.Add(user);
                     RegistryKey key = Registry.CurrentUser.CreateSubKey(REGRoot);
                     key.SetValue(user, Encrypt(pass));
+                    this.Visibility = Visibility.Collapsed;
                 }
                 else
                 {
@@ -93,7 +97,7 @@ namespace MyDisk
             IntPtr invalidFd = new IntPtr(-1);
 
             msp.dispatch = volume;
-            msp.formatterName = "hellofs";
+            msp.formatterName = "BaiduDisk";
 
             //if (args.Length != 1)
             //{
@@ -105,6 +109,10 @@ namespace MyDisk
             if (err == 0)
             {
                 mcp.mountSourceName = par[0];
+                DriveInfo[] dinfos = DriveInfo.GetDrives();
+                string tem = "CDEFGHIJKLMNOPQRSTUVWXYZ";
+                char dltter = tem.ToCharArray().First(c => !dinfos.Any(i => i.Name.StartsWith(c.ToString())));
+                mcp.driveLetter = dltter;
                 err = Pfm.ApiFactory(out pfm);
                 if (err != 0)
                 {
@@ -214,7 +222,9 @@ namespace MyDisk
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            this.WindowState = WindowState.Minimized;
+            this.Visibility = Visibility.Collapsed;
+            this.ShowInTaskbar = false;
+            //this.WindowState = WindowState.Minimized;
             icon.Visible = !exit;
             e.Cancel = !exit;
         }
